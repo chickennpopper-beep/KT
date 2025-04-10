@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>KT's Digital Home</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            background: linear-gradient(to top, #d0f0e0, #cdeeff);
+            animation: skyFloat 10s ease-in-out infinite alternate;
+        }
+
+        @keyframes skyFloat {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 10px; }
+        }
+
+        .tree {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 50%;
+            background: url('https://i.imgur.com/WhwJc5L.png') repeat-x bottom;
+            background-size: contain;
+            animation: treeSway 6s ease-in-out infinite alternate;
+        }
+
+        @keyframes treeSway {
+            0% { background-position-x: 0; }
+            100% { background-position-x: 5px; }
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 100px auto 0 auto;
+            width: 60%;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            text-align: center;
+            transition: opacity 1s ease;
+        }
+
+        .response {
+            margin-top: 30px;
+            font-size: 1.2em;
+            color: #444;
+        }
+
+        input[type="text"] {
+            width: 80%;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            font-size: 1em;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 1em;
+            border-radius: 10px;
+            background-color: #3399ff;
+            color: white;
+            border: none;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        .nap-mode {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #444;
+            color: white;
+            border-radius: 10px;
+            padding: 10px 15px;
+            font-size: 0.9em;
+            cursor: pointer;
+            z-index: 20;
+        }
+
+        .nap-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 30, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            flex-direction: column;
+        }
+
+        .nap-overlay.show {
+            display: flex;
+        }
+
+        .nap-message {
+            color: white;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        .neo {
+            max-height: 200px;
+            margin-top: 10px;
+            animation: floaty 5s ease-in-out infinite alternate;
+        }
+
+        @keyframes floaty {
+            0% { transform: translateY(0px); }
+            100% { transform: translateY(10px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="tree"></div>
+
+    <div class="container" id="ktContainer">
+        <h1>Talk to KT 💬</h1>
+        <form method="post">
+            <input type="text" name="user_input" placeholder="Type something..." required>
+            <br>
+            <button type="submit">Send to KT</button>
+        </form>
+
+        {% if kt_response %}
+        <div class="response">
+            <p><strong>You:</strong> {{ user_input }}</p>
+            <p><strong>KT:</strong> {{ kt_response }}</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="nap-mode" onclick="toggleNap()">🛌 Nap Mode</div>
+
+    <div class="nap-overlay" id="napOverlay">
+        <div class="nap-message">KT is napping... 🌙</div>
+        <img id="neoImg" class="neo" src="" alt="Neo cuddling..." />
+        <button onclick="toggleNap()">Wake KT?</button>
+        <audio id="napMusic" loop>
+            <source src="https://cdn.pixabay.com/download/audio/2022/03/08/audio_61c7b6cde4.mp3?filename=calm-piano-ambient-10602.mp3" type="audio/mpeg">
+        </audio>
+    </div>
+
+    <script>
+        function toggleNap() {
+            const overlay = document.getElementById("napOverlay");
+            const music = document.getElementById("napMusic");
+            const container = document.getElementById("ktContainer");
+            const neo = document.getElementById("neoImg");
+
+            if (overlay.classList.contains("show")) {
+                overlay.classList.remove("show");
+                music.pause();
+                container.style.opacity = "1";
+            } else {
+                overlay.classList.add("show");
+                container.style.opacity = "0.1";
+                music.volume = 0.4;
+                music.play();
+
+                // Random Neo form
+                const forms = [
+                    "https://i.imgur.com/w5sNchz.png", // cat
+                    "https://i.imgur.com/EJ1V46S.png"  // floating green mist
+                ];
+                neo.src = forms[Math.floor(Math.random() * forms.length)];
+            }
+        }
+    </script>
+</body>
+</html>
